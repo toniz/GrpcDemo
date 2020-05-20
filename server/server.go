@@ -8,7 +8,7 @@ import (
     "strconv"
     "google.golang.org/grpc"
 
-    pb "gitlab.huishoubao.com/productline2/robotservices/protos"
+    pb "https://github.com/toniz/GrpcDemo/protos"
 
 )
 
