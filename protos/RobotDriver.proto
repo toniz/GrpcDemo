@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto;
+
+message DriverRequest{
+    string data = 1;
+}
+
+message DriverResponse{
+    string data = 1;
+}
+
+service RobotDriver{
+    rpc Control (DriverRequest) returns (DriverResponse){};
+    rpc StreamControl(stream DriverRequest) returns(stream DriverResponse){};
+}
+
