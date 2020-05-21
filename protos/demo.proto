@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto;
+
+message Request{
+    string Data = 1;
+}
+
+message Response{
+    string Data = 1;
+}
+
+service Guide{
+    rpc Call (Request) returns (Response){};
+    rpc StreamCall(stream Request) returns(stream Response){};
+}
+
