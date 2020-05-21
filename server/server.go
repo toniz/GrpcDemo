@@ -8,7 +8,7 @@ import (
     "strconv"
     "google.golang.org/grpc"
 
-    pb "https://github.com/toniz/GrpcDemo/protos"
+    pb "github.com/toniz/GrpcDemo/protos"
 
 )
 
@@ -26,7 +26,7 @@ func main() {
     }
     log.Println(Address + " net.Listing...")
     grpcServer := grpc.NewServer()
-    pb.RegisterStreamServer(grpcServer, &StreamService{})
+    pb.RegisterGuideServer(grpcServer, &StreamService{})
 
     err = grpcServer.Serve(listener)
     if err != nil {
@@ -35,15 +35,15 @@ func main() {
 }
 
 // 单步调用
-func (s *StreamService) Control(ctx context.Context, req *pb.DriverRequest) (*pb.DriverResponse, error) {
-    res := pb.SimpleResponse{
+func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response, error) {
+    res := pb.Response{
         Value: "hello " + req.Data,
     }
     return &res, nil
 }
 
 // 流式调用
-func (s *StreamService) StreamControl(srv pb.Stream_ConversationsServer) error {
+func (s *StreamService) StreamCall(srv pb.Guide_StreamCallServer) error {
     n := 1
     for {
         req, err := srv.Recv()
@@ -53,14 +53,14 @@ func (s *StreamService) StreamControl(srv pb.Stream_ConversationsServer) error {
         if err != nil {
             return err
         }
-        err = srv.Send(&pb.StreamResponse{
+        err = srv.Send(&pb.Response{
             Answer: "from stream server answer: the " + strconv.Itoa(n) + " question is " + req.Question,
         })
         if err != nil {
             return err
         }
         n++
-        log.Printf("from stream client question: %s", req.Question)
+        log.Printf("from stream client question: %s", req.Data)
     }
 }
 

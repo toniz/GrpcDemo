@@ -1,2 +1,2 @@
-protoc -I ../protos ../protos/RobotDriver.proto --go_out=plugins=grpc:../protos
+protoc -I ../protos ../protos/demo.proto --go_out=plugins=grpc:../protos
 
