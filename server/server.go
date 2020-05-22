@@ -2,12 +2,13 @@ package main
 
 import (
     "context"
-    "io"
+//    "io"
     "log"
     "net"
-    "strconv"
+//    "strconv"
     "google.golang.org/grpc"
 
+    "time"
     pb "github.com/toniz/GrpcDemo/protos"
 
 )
@@ -19,6 +20,9 @@ const (
     Network string = "tcp"
 )
 
+var chans [5]chan string
+
+
 func main() {
     listener, err := net.Listen(Network, Address)
     if err != nil {
@@ -27,6 +31,15 @@ func main() {
     log.Println(Address + " net.Listing...")
     grpcServer := grpc.NewServer()
     pb.RegisterGuideServer(grpcServer, &StreamService{})
+
+    for i := range chans {
+        chans[i] = make(chan string)
+    }
+
+    go func(){
+       chans[1] <- "test 1"
+       time.Sleep(1)
+    }()
 
     err = grpcServer.Serve(listener)
     if err != nil {
@@ -37,30 +50,45 @@ func main() {
 // 单步调用
 func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response, error) {
     res := pb.Response{
-        Value: "hello " + req.Data,
+        Data: "hello " + req.Data,
     }
     return &res, nil
 }
 
 // 流式调用
 func (s *StreamService) StreamCall(srv pb.Guide_StreamCallServer) error {
-    n := 1
+    var code int32
+    var seq int32
+    if name, err := srv.Recv(); err != nil {
+        log.Printf("Recv From Client err: %v", err)
+        return err
+    } else {
+        log.Printf("Client code[%v] login", name.Client_id)
+        code = name.Client_id
+    }
+
     for {
-        req, err := srv.Recv()
-        if err == io.EOF {
-            return nil
-        }
-        if err != nil {
-            return err
-        }
-        err = srv.Send(&pb.Response{
-            Answer: "from stream server answer: the " + strconv.Itoa(n) + " question is " + req.Question,
+
+        val := <- chans[code]
+
+        err := srv.Send(&pb.Response{
+            Client_id: code,
+            Seq: seq,
+            Data: "The Server CChan Val: " + strconv.Itoa(val) ,
         })
+
         if err != nil {
             return err
         }
-        n++
-        log.Printf("from stream client question: %s", req.Data)
+
+        req, err := srv.Recv()
+        if err != nil {
+            log.Printf("Recv From Clinet err: %v", err)
+            return err
+        }
+
+        seq++
+        log.Printf("Recv From Client: %v", req)
     }
 }
 
