@@ -23,13 +23,8 @@ github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMyw
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
-github.com/toniz/GrpcDemo v0.0.0-20200520102223-a11f9fcf5a17 h1:3z8HlvSY6/gJ2lmIseYvF/agfnQOtoYKWfysGACH/a8=
-github.com/toniz/GrpcDemo v0.0.0-20200520102223-a11f9fcf5a17/go.mod h1:pDmoD1D5v+O+1xQrpOfYuI7cSHyfpYuZheTSoyCQLgI=
-github.com/toniz/GrpcDemo v0.0.0-20200521021823-eea68eef3c34 h1:SuXspklMF13BoF6F/WKJ//8gsoK0lIV6TXouuBRXjuE=
 github.com/toniz/GrpcDemo v0.0.0-20200521022319-fd08bcc17475 h1:KgTYHeKtarsChJu2jz2evYuQYsHXSXJDvgNC8DeKfvU=
 github.com/toniz/GrpcDemo v0.0.0-20200521022319-fd08bcc17475/go.mod h1:pDmoD1D5v+O+1xQrpOfYuI7cSHyfpYuZheTSoyCQLgI=
-github.com/toniz/GrpcDemo v0.0.0-20200522072431-8bdb0cd807f7 h1:NagB5404SHbKBMItSrsftZ+28+YghqIznLZNx1Xhi/Y=
-github.com/toniz/GrpcDemo v0.0.0-20200522072431-8bdb0cd807f7/go.mod h1:pDmoD1D5v+O+1xQrpOfYuI7cSHyfpYuZheTSoyCQLgI=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/exp v0.0.0-20190121172915-509febef88a4/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/lint v0.0.0-20181026193005-c67002cb31c3/go.mod h1:UVdnD1Gm6xHRNCYTkRU2/jEulfH38KcIWyp/GAMgvoE=
