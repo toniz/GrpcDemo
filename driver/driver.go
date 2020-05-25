@@ -80,7 +80,7 @@ func streamcall() error {
 
         log.Println(res)
   
-        if res.Data == "PING" {
+        if res.Ping == "PING" {
             log.Printf("StreamCall Recevie PING From Server")
             continue
         }
@@ -88,6 +88,8 @@ func streamcall() error {
         if seq != res.Seq {
             log.Printf("Seq %d != %d ", seq, res.Seq)
         }
+
+        // test function, remove it.
         time.Sleep(time.Second)
 
         err = stream.Send(&pb.Request{

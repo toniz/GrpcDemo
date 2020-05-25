@@ -4,7 +4,6 @@ import (
     "context"
     "log"
     "net"
-//    "strconv"
     "time"
 
     "google.golang.org/grpc"
@@ -70,13 +69,13 @@ func main() {
 func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response, error) {
     log.Println("Receive Request: ", req)
     driverId := req.DriverId
-    action := req.Data
+    cmd := req.Cmd
 
     if loginStatus[driverId] == false {
         log.Printf("Driver[%d] Not Ready!", driverId)
         res := pb.Response{
             DriverId: driverId,
-            Data: "driver not ready: " + req.Data,
+            Data: "driver not ready: " + req.Cmd,
         }
         return &res, nil
     }
@@ -87,7 +86,7 @@ func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response
     default:
         res := pb.Response{
             DriverId: driverId,
-            Data: "busy: " + req.Data,
+            Data: "busy: " + req.Cmd,
         }
         return &res, nil
     }
@@ -102,7 +101,7 @@ func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response
    
     res := pb.Response{
         DriverId: driverId,
-        Data: "finish: " + req.Data,
+        Data: "finish: " + req.Cmd,
     }       
    
     return &res, nil
@@ -139,7 +138,7 @@ func (s *StreamService) StreamCall(srv pb.Guide_StreamCallServer) error {
                 err := srv.Send(&pb.Response{
                     DriverId: driverId,
                     Seq: seq,
-                    Data: "PING",
+                    Ping: "PING",
                 })
                 
                 if err != nil {

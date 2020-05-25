@@ -2,9 +2,7 @@ package main
 
 import (
     "context"
-//    "io"
     "log"
-//    "strconv"
     "flag"
 
     "time"
@@ -16,11 +14,11 @@ const Address string = ":8000"
 
 var guideClient pb.GuideClient
 var dreverId int
-var actionId string
+var cmdId string
 
 func init() {
     flag.IntVar(&dreverId, "d", 1, "Driver ID selected")
-    flag.StringVar(&actionId, "a", "move", "Action ID selected")
+    flag.StringVar(&cmdId, "c", "move", "Action ID selected")
 }
 
 func main() {
@@ -39,7 +37,7 @@ func main() {
 func call() {
     req := pb.Request{
         DriverId: int32(dreverId),
-        Data: actionId,
+        Cmd: cmdId,
     }
 
     log.Println(req)

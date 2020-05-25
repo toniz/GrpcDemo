@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package controler;
+
+message Request{
+    int32 driver_id = 1;
+    string cmd = 2;
+   
+}
+
+message Response{
+    int32 driver_id = 1;
+    string data = 2;
+}
+
+service Control{
+    rpc Call (Request) returns (Response){};
+}
+
