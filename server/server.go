@@ -95,7 +95,7 @@ func (s *StreamService) Call(ctx context.Context, req *pb.Command) (*pb.Result, 
         log.Println("Receive Release Lock")    
     }()
 
-    for _, v := range cmdlist[action] {
+    for _, v := range cmdlist[cmd] {
         chans[driverId].ch <- v
     }
    

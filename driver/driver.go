@@ -38,7 +38,7 @@ func main() {
 
         defer conn.Close()
 
-        guideClient = pb.NewGuideClient(conn)
+        guideClient = pb.NewControlClient(conn)
         err = streamcall()
         if err != nil {
             log.Printf("streamcall Failure: %v", err)

@@ -77,7 +77,8 @@ int DriverClient::streamcall()  {
 
     Status status = stream->Finish();
     if (!status.ok()) {
-        std::cout << "Stream rpc failed." << std::endl;
+        std::cout << "Stream rpc failed." << status.error_code() << std::endl;
+        return status.error_code();
     }
 }
 
@@ -89,6 +90,10 @@ int main(int argc, char** argv) {
         DriverClient driver(grpc::CreateChannel("localhost:8000", grpc::InsecureChannelCredentials()));
         int ret = driver.streamcall();
         std::cout << ret << std::endl;
+        if (ret == 6)
+        {
+            std::cout << "Driver Exists" << std::endl;
+        }
         sleep(3);
         cnt++;
     }
