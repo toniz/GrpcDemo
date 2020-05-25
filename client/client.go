@@ -4,7 +4,7 @@ import (
     "context"
 //    "io"
     "log"
-    "strconv"
+//    "strconv"
     "flag"
 
     "time"
@@ -19,27 +19,21 @@ var dreverId int
 var actionId string
 
 func init() {
-    flag.IntVar(&dreverId, "Driver ID", 1, "Driver ID selected")
-    flag.StringVar(&actionId, "Action ID", "move", "Action ID selected")
+    flag.IntVar(&dreverId, "d", 1, "Driver ID selected")
+    flag.StringVar(&actionId, "a", "move", "Action ID selected")
 }
 
 func main() {
-    cnt := 0
-    for {
-        cnt++
-        log.Printf("Strat New Connection: %d", cnt)
-        conn, err := grpc.Dial(Address, grpc.WithInsecure(), grpc.WithBlock())
-        if err != nil {
-            log.Printf("Connect Failed: %v", err)
-            time.Sleep(time.Second)
-            continue
-        }
-
-        defer conn.Close()
-
+    flag.Parse()
+    conn, err := grpc.Dial(Address, grpc.WithInsecure(), grpc.WithBlock())
+    if err != nil {
+        log.Printf("Connect Failed: %v", err)
+        time.Sleep(time.Second)
+    } else {
         guideClient = pb.NewGuideClient(conn)
         call()
     }
+    defer conn.Close()
 }
 
 func call() {
@@ -48,6 +42,7 @@ func call() {
         Data: actionId,
     }
 
+    log.Println(req)
     res, err := guideClient.Call(context.Background(), &req)
     if err != nil {
         log.Printf("Call Server err: %v", err)

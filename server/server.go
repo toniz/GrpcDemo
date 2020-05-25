@@ -2,13 +2,14 @@ package main
 
 import (
     "context"
-//    "io"
     "log"
     "net"
 //    "strconv"
-    "google.golang.org/grpc"
-
     "time"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/codes"
+    "google.golang.org/grpc/status"
     pb "github.com/toniz/GrpcDemo/protos"
 
 )
@@ -19,8 +20,7 @@ type StreamService struct{}
 // Make sure that only one request controled the driver
 type SafeChannel struct {
     ch  chan string
-    inuse bool
-    mux sync.Mutex
+    mux chan struct{}
 }
 
 type ActionList map[string][]string
@@ -32,13 +32,14 @@ const (
 
 var (
     chans [5]SafeChannel
+    loginStatus [5]bool
     cmdlist ActionList
 )
 
 func init() {
     cmdlist = ActionList{
-        "move": ["R_jointHome", "R_movel", "R_ChangeAttitude"],
-        "stopmove": ["R_stopMove", "R_jointHome"],
+        "move": {"R_jointHome", "R_movel", "R_ChangeAttitude"},
+        "stopmove": {"R_stopMove", "R_jointHome"},
     }
 }
 
@@ -52,7 +53,11 @@ func main() {
     pb.RegisterGuideServer(grpcServer, &StreamService{})
 
     for i := range chans {
-        chans[i] = make(chan string, 0)
+        chans[i] = SafeChannel{
+            ch: make(chan string, 0),
+            mux: make(chan struct{}, 1),
+        }
+        chans[i].mux <- struct{}{}
     }
 
     err = grpcServer.Serve(listener)
@@ -65,49 +70,90 @@ func main() {
 func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response, error) {
     log.Println("Receive Request: ", req)
     driverId := req.DriverId
-    if chans[driverId].inuse {
+    action := req.Data
+
+    if loginStatus[driverId] == false {
+        log.Printf("Driver[%d] Not Ready!", driverId)
+        res := pb.Response{
+            DriverId: driverId,
+            Data: "driver not ready: " + req.Data,
+        }
+        return &res, nil
+    }
+
+    select {
+    case <-chans[driverId].mux:
+        log.Println("Receive Get Lock")
+    default:
         res := pb.Response{
             DriverId: driverId,
             Data: "busy: " + req.Data,
         }
         return &res, nil
     }
+    defer func(){ 
+        chans[driverId].mux <- struct{}{}
+        log.Println("Receive Release Lock")    
+    }()
 
-    chans[driverId].mux.Lock()
-    chans[driverId].inuse = true
-
-    for v := range cmdlist[driverId] {
-        chans[req.DriverId] <- v
+    for _, v := range cmdlist[action] {
+        chans[driverId].ch <- v
     }
-
+   
     res := pb.Response{
         DriverId: driverId,
         Data: "finish: " + req.Data,
     }       
-
-    chans[driverId].inuse = false
-    chans[driverId].mux.Unlock()
+   
     return &res, nil
 }
 
-// 流式调用
+// Call driver by stream
 func (s *StreamService) StreamCall(srv pb.Guide_StreamCallServer) error {
-    var code int32
+    var driverId int32
     var seq int32
     if name, err := srv.Recv(); err != nil {
         log.Printf("Recv From Driver err: %v", err)
         return err
     } else {
-        log.Printf("Driver code[%v] login", name.DriverId)
-        code = name.DriverId
+        log.Printf("Driver driverId[%v] login", name.DriverId)
+        driverId = name.DriverId
+        seq = name.Seq
     }
 
+    if loginStatus[driverId] == true {
+        log.Printf("Driver driverId[%v] AlReady login", driverId)
+        return status.Errorf(codes.AlreadyExists, "AlReady login!")
+    }
+
+    loginStatus[driverId] = true
+    defer func(){loginStatus[driverId] = false}()
+
     for {
-        val := <- chans[code]
+        var val string
+        select {
+            case val = <- chans[driverId].ch:
+                log.Printf("Driver driverId[%v] Get Action [%s]!", driverId, val)
+            case <-time.After(3 * time.Second):
+                log.Printf("Driver driverId[%v] Timeout And Continue!", driverId)
+                err := srv.Send(&pb.Response{
+                    DriverId: driverId,
+                    Seq: seq,
+                    Data: "PING",
+                })
+                
+                if err != nil {
+                    log.Printf("Clinet err: %v", err)
+                    return err
+                }
+
+                continue
+        }
+
         err := srv.Send(&pb.Response{
-            DriverId: code,
+            DriverId: driverId,
             Seq: seq,
-            Data: "The Server CChan Val: " + val ,
+            Data: "Driver Do Action: " + val ,
         })
 
         if err != nil {

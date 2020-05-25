@@ -9,6 +9,8 @@ import (
 
     "time"
     "google.golang.org/grpc"
+    "google.golang.org/grpc/codes"
+    "google.golang.org/grpc/status"
     pb "github.com/toniz/GrpcDemo/protos"
 )
 
@@ -18,11 +20,11 @@ var guideClient pb.GuideClient
 var channum int
 
 func init() {
-    flag.IntVar(&channum, "channum", 1, "chan numbers selected")
+    flag.IntVar(&channum, "c", 1, "chan numbers selected")
 }
 
 func main() {
-
+    flag.Parse()
     cnt := 0
     for {
         cnt++
@@ -37,16 +39,23 @@ func main() {
         defer conn.Close()
 
         guideClient = pb.NewGuideClient(conn)
-        streamcall()
+        err = streamcall()
+        if err != nil {
+            log.Printf("streamcall Failure: %v", err)
+            s := status.Convert(err)
+            if s.Code() == codes.AlreadyExists {
+                log.Fatalln("Already Exists DriverID")
+            }
+        }
     }
 }
 
-
-func streamcall() {
+func streamcall() error {
     stream, err := guideClient.StreamCall(context.Background())
     if err != nil {
         log.Printf("get stream call err: %v", err)
     }
+    defer stream.CloseSend()
 
     log.Printf("Current Driver: %d", channum)
 
@@ -60,18 +69,22 @@ func streamcall() {
     })
 
     if err != nil {
-        log.Printf("stream login err: %v", err)
+        return err
     }
 
     for {
         res, err := stream.Recv()
         if err != nil {
-            log.Printf("StreamCall Recv err: %v", err)
-            break
+            return err
         }
 
         log.Println(res)
-        
+  
+        if res.Data == "PING" {
+            log.Printf("StreamCall Recevie PING From Server")
+            continue
+        }
+      
         if seq != res.Seq {
             log.Printf("Seq %d != %d ", seq, res.Seq)
         }
@@ -80,19 +93,15 @@ func streamcall() {
         err = stream.Send(&pb.Request{
             DriverId: int32(channum),
             Seq: seq,
-            Data: "stream client rpc " + strconv.Itoa(int(seq)),
+            Data: "Driver Finish: " + strconv.Itoa(int(seq)),
         })
         
         if err != nil {
             log.Printf("stream login err: %v", err)
+            return err
         }
 
         seq++
-    }
-
-    err = stream.CloseSend()
-    if err != nil {
-        log.Printf("Conversations close stream err: %v", err)
     }
 }
 
