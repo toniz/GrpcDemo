@@ -12,7 +12,7 @@ import (
 
 const Address string = ":8000"
 
-var guideClient pb.GuideClient
+var guideClient pb.ControlClient
 var dreverId int
 var cmdId string
 
@@ -28,14 +28,14 @@ func main() {
         log.Printf("Connect Failed: %v", err)
         time.Sleep(time.Second)
     } else {
-        guideClient = pb.NewGuideClient(conn)
+        guideClient = pb.NewControlClient(conn)
         call()
     }
     defer conn.Close()
 }
 
 func call() {
-    req := pb.Request{
+    req := pb.Command{
         DriverId: int32(dreverId),
         Cmd: cmdId,
     }

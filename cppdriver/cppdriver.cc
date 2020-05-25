@@ -13,19 +13,19 @@ using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 using grpc::ClientReaderWriter;
-using driver::Request;
-using driver::Response;
-using driver::Drive;
+using controler::Request;
+using controler::Response;
+using controler::Control;
 
 class DriverClient {
 public:
     DriverClient(std::shared_ptr<Channel> channel)
-            : stub_(Drive::NewStub(channel)) {}
+            : stub_(Control::NewStub(channel)) {}
 
     int streamcall();
 
 private:
-    std::unique_ptr<Drive::Stub> stub_;
+    std::unique_ptr<Control::Stub> stub_;
 };
 
 int DriverClient::streamcall()  {

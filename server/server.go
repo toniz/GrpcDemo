@@ -49,7 +49,7 @@ func main() {
     }
     log.Println(Address + " net.Listing...")
     grpcServer := grpc.NewServer()
-    pb.RegisterGuideServer(grpcServer, &StreamService{})
+    pb.RegisterControlServer(grpcServer, &StreamService{})
 
     for i := range chans {
         chans[i] = SafeChannel{
@@ -66,14 +66,14 @@ func main() {
 }
 
 // client call a sequence of actions
-func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response, error) {
+func (s *StreamService) Call(ctx context.Context, req *pb.Command) (*pb.Result, error) {
     log.Println("Receive Request: ", req)
     driverId := req.DriverId
     cmd := req.Cmd
 
     if loginStatus[driverId] == false {
         log.Printf("Driver[%d] Not Ready!", driverId)
-        res := pb.Response{
+        res := pb.Result{
             DriverId: driverId,
             Data: "driver not ready: " + req.Cmd,
         }
@@ -84,7 +84,7 @@ func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response
     case <-chans[driverId].mux:
         log.Println("Receive Get Lock")
     default:
-        res := pb.Response{
+        res := pb.Result{
             DriverId: driverId,
             Data: "busy: " + req.Cmd,
         }
@@ -99,7 +99,7 @@ func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response
         chans[driverId].ch <- v
     }
    
-    res := pb.Response{
+    res := pb.Result{
         DriverId: driverId,
         Data: "finish: " + req.Cmd,
     }       
@@ -108,7 +108,7 @@ func (s *StreamService) Call(ctx context.Context, req *pb.Request) (*pb.Response
 }
 
 // Call driver by stream
-func (s *StreamService) StreamCall(srv pb.Guide_StreamCallServer) error {
+func (s *StreamService) StreamCall(srv pb.Control_StreamCallServer) error {
     var driverId int32
     var seq int32
     if name, err := srv.Recv(); err != nil {

@@ -1,6 +1,16 @@
 syntax = "proto3";
 
-package driver;
+package controler    ;
+
+message Command{
+    int32 driver_id = 1;
+    string cmd = 2;
+}
+
+message Result{
+    int32 driver_id = 1;
+    string data = 2;
+}
 
 message Request{
     int32 driver_id = 1;
@@ -16,7 +26,8 @@ message Response{
     string ping = 4;
 }
 
-service Drive{
+service Control{
+    rpc Call (Command) returns (Result){};
     rpc StreamCall(stream Request) returns(stream Response){};
 }
 

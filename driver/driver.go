@@ -16,7 +16,7 @@ import (
 
 const Address string = ":8000"
 
-var guideClient pb.GuideClient
+var guideClient pb.ControlClient
 var channum int
 
 func init() {
