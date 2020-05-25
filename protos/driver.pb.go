@@ -305,15 +305,15 @@ var file_driver_proto_rawDesc = []byte{
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x73, 0x65, 0x71, 0x12, 0x12, 0x0a, 0x04, 0x64,
 	0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12,
 	0x12, 0x0a, 0x04, 0x70, 0x69, 0x6e, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70,
-	0x69, 0x6e, 0x67, 0x32, 0x75, 0x0a, 0x05, 0x44, 0x72, 0x69, 0x76, 0x65, 0x12, 0x2f, 0x0a, 0x04,
-	0x43, 0x61, 0x6c, 0x6c, 0x12, 0x12, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72,
-	0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x1a, 0x11, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72,
-	0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x00, 0x12, 0x3b, 0x0a,
-	0x0a, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x61, 0x6c, 0x6c, 0x12, 0x12, 0x2e, 0x63, 0x6f,
-	0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x13, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x69, 0x6e, 0x67, 0x32, 0x77, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x12, 0x2f,
+	0x0a, 0x04, 0x43, 0x61, 0x6c, 0x6c, 0x12, 0x12, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c,
+	0x65, 0x72, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x1a, 0x11, 0x2e, 0x63, 0x6f, 0x6e,
+	0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x00, 0x12,
+	0x3b, 0x0a, 0x0a, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x61, 0x6c, 0x6c, 0x12, 0x12, 0x2e,
+	0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x13, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -336,10 +336,10 @@ var file_driver_proto_goTypes = []interface{}{
 	(*Response)(nil), // 3: controler.Response
 }
 var file_driver_proto_depIdxs = []int32{
-	0, // 0: controler.Drive.Call:input_type -> controler.Command
-	2, // 1: controler.Drive.StreamCall:input_type -> controler.Request
-	1, // 2: controler.Drive.Call:output_type -> controler.Result
-	3, // 3: controler.Drive.StreamCall:output_type -> controler.Response
+	0, // 0: controler.Control.Call:input_type -> controler.Command
+	2, // 1: controler.Control.StreamCall:input_type -> controler.Request
+	1, // 2: controler.Control.Call:output_type -> controler.Result
+	3, // 3: controler.Control.StreamCall:output_type -> controler.Response
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -430,55 +430,55 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// DriveClient is the client API for Drive service.
+// ControlClient is the client API for Control service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type DriveClient interface {
+type ControlClient interface {
 	Call(ctx context.Context, in *Command, opts ...grpc.CallOption) (*Result, error)
-	StreamCall(ctx context.Context, opts ...grpc.CallOption) (Drive_StreamCallClient, error)
+	StreamCall(ctx context.Context, opts ...grpc.CallOption) (Control_StreamCallClient, error)
 }
 
-type driveClient struct {
+type controlClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDriveClient(cc grpc.ClientConnInterface) DriveClient {
-	return &driveClient{cc}
+func NewControlClient(cc grpc.ClientConnInterface) ControlClient {
+	return &controlClient{cc}
 }
 
-func (c *driveClient) Call(ctx context.Context, in *Command, opts ...grpc.CallOption) (*Result, error) {
+func (c *controlClient) Call(ctx context.Context, in *Command, opts ...grpc.CallOption) (*Result, error) {
 	out := new(Result)
-	err := c.cc.Invoke(ctx, "/controler.Drive/Call", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/controler.Control/Call", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *driveClient) StreamCall(ctx context.Context, opts ...grpc.CallOption) (Drive_StreamCallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Drive_serviceDesc.Streams[0], "/controler.Drive/StreamCall", opts...)
+func (c *controlClient) StreamCall(ctx context.Context, opts ...grpc.CallOption) (Control_StreamCallClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Control_serviceDesc.Streams[0], "/controler.Control/StreamCall", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &driveStreamCallClient{stream}
+	x := &controlStreamCallClient{stream}
 	return x, nil
 }
 
-type Drive_StreamCallClient interface {
+type Control_StreamCallClient interface {
 	Send(*Request) error
 	Recv() (*Response, error)
 	grpc.ClientStream
 }
 
-type driveStreamCallClient struct {
+type controlStreamCallClient struct {
 	grpc.ClientStream
 }
 
-func (x *driveStreamCallClient) Send(m *Request) error {
+func (x *controlStreamCallClient) Send(m *Request) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *driveStreamCallClient) Recv() (*Response, error) {
+func (x *controlStreamCallClient) Recv() (*Response, error) {
 	m := new(Response)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -486,64 +486,64 @@ func (x *driveStreamCallClient) Recv() (*Response, error) {
 	return m, nil
 }
 
-// DriveServer is the server API for Drive service.
-type DriveServer interface {
+// ControlServer is the server API for Control service.
+type ControlServer interface {
 	Call(context.Context, *Command) (*Result, error)
-	StreamCall(Drive_StreamCallServer) error
+	StreamCall(Control_StreamCallServer) error
 }
 
-// UnimplementedDriveServer can be embedded to have forward compatible implementations.
-type UnimplementedDriveServer struct {
+// UnimplementedControlServer can be embedded to have forward compatible implementations.
+type UnimplementedControlServer struct {
 }
 
-func (*UnimplementedDriveServer) Call(context.Context, *Command) (*Result, error) {
+func (*UnimplementedControlServer) Call(context.Context, *Command) (*Result, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Call not implemented")
 }
-func (*UnimplementedDriveServer) StreamCall(Drive_StreamCallServer) error {
+func (*UnimplementedControlServer) StreamCall(Control_StreamCallServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamCall not implemented")
 }
 
-func RegisterDriveServer(s *grpc.Server, srv DriveServer) {
-	s.RegisterService(&_Drive_serviceDesc, srv)
+func RegisterControlServer(s *grpc.Server, srv ControlServer) {
+	s.RegisterService(&_Control_serviceDesc, srv)
 }
 
-func _Drive_Call_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Control_Call_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Command)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DriveServer).Call(ctx, in)
+		return srv.(ControlServer).Call(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/controler.Drive/Call",
+		FullMethod: "/controler.Control/Call",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DriveServer).Call(ctx, req.(*Command))
+		return srv.(ControlServer).Call(ctx, req.(*Command))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Drive_StreamCall_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(DriveServer).StreamCall(&driveStreamCallServer{stream})
+func _Control_StreamCall_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ControlServer).StreamCall(&controlStreamCallServer{stream})
 }
 
-type Drive_StreamCallServer interface {
+type Control_StreamCallServer interface {
 	Send(*Response) error
 	Recv() (*Request, error)
 	grpc.ServerStream
 }
 
-type driveStreamCallServer struct {
+type controlStreamCallServer struct {
 	grpc.ServerStream
 }
 
-func (x *driveStreamCallServer) Send(m *Response) error {
+func (x *controlStreamCallServer) Send(m *Response) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *driveStreamCallServer) Recv() (*Request, error) {
+func (x *controlStreamCallServer) Recv() (*Request, error) {
 	m := new(Request)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -551,19 +551,19 @@ func (x *driveStreamCallServer) Recv() (*Request, error) {
 	return m, nil
 }
 
-var _Drive_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "controler.Drive",
-	HandlerType: (*DriveServer)(nil),
+var _Control_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "controler.Control",
+	HandlerType: (*ControlServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Call",
-			Handler:    _Drive_Call_Handler,
+			Handler:    _Control_Call_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StreamCall",
-			Handler:       _Drive_StreamCall_Handler,
+			Handler:       _Control_StreamCall_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
