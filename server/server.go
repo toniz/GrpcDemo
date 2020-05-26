@@ -1,7 +1,7 @@
 package main
 
 import (
-    "context"
+    //"context"
     "log"
     "net"
     "time"
@@ -68,32 +68,32 @@ func main() {
 // client call a sequence of actions
 func (s *StreamService) Call(srv pb.Control_CallServer)  error {
     var driverId int32
-    var cmd int32
+    var cmd string
     if name, err := srv.Recv(); err != nil {
         log.Printf("Recv From Driver err: %v", err)
         return err
     } else {
-        log.Printf("Driver driverId[%v] login", name.DriverId)
+        log.Printf("Driver driverId[%v] Client login", name.DriverId)
         driverId = name.DriverId
         cmd = name.Cmd
     }
-
+    
     if loginStatus[driverId] == false {
         log.Printf("Driver[%d] Not Ready!", driverId)
         err := srv.Send(&pb.Result{
             DriverId: driverId,
-            Data: "driver not ready: " + req.Cmd,
+            Data: "driver not ready: " + cmd,
         })
         return err
     }
-
+    
     select {
     case <-chans[driverId].mux:
         log.Println("Receive Get Lock")
     default:
         err := srv.Send(&pb.Result{
             DriverId: driverId,
-            Data: "busy: " + req.Cmd,
+            Data: "busy: " + cmd,
         })
         return err
     }
@@ -101,26 +101,38 @@ func (s *StreamService) Call(srv pb.Control_CallServer)  error {
         chans[driverId].mux <- struct{}{}
         log.Println("Receive Release Lock")    
     }()
-
-    for _, v := range cmdlist[cmd] {
-        select {
-        case chans[driverId].ch <- v:
-     //       log.Printf("Send %s", v)
-        case <-time.After(5 * time.Second):
-            log.Println("Send Timeout!")
-            err := srv.Send(&pb.Result{
-                DriverId: driverId,
-                Data: "Call Driver Timeout: " + req.Cmd,
-            })
+        
+    for {
+        var driverId int32
+        var cmd string
+        if name, err := srv.Recv(); err != nil {
+            log.Printf("Recv From Driver err: %v", err)
             return err
+        } else {
+            log.Printf("Driver driverId[%v] cmd", name.DriverId)
+            driverId = name.DriverId
+            cmd = name.Cmd
         }
-    }
 
-    err := srv.Send(&pb.Result{
-        DriverId: driverId,
-        Data: "finish: " + req.Cmd,
-    })
-    return err
+        for _, v := range cmdlist[cmd] {
+            select {
+            case chans[driverId].ch <- v:
+         //       log.Printf("Send %s", v)
+            case <-time.After(5 * time.Second):
+                log.Println("Send Timeout!")
+                err := srv.Send(&pb.Result{
+                    DriverId: driverId,
+                    Data: "Call Driver Timeout: " + cmd,
+                })
+                return err
+            }
+        }
+        
+        srv.Send(&pb.Result{
+            DriverId: driverId,
+            Data: "finish: " + cmd,
+        })
+    }
 }
 
 // Call driver by stream

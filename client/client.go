@@ -34,7 +34,7 @@ func main() {
     defer conn.Close()
 }
 
-func call() {
+func call() error {
     req := pb.Command{
         DriverId: int32(dreverId),
         Cmd: cmdId,
@@ -50,20 +50,34 @@ func call() {
         DriverId: int32(dreverId),
         Cmd: cmdId,
     })
-    log.Println(req)
+    log.Println(req, err)
+
+    err = stream.Send(&pb.Command{
+        DriverId: int32(dreverId),
+        Cmd: cmdId,
+    })
+    log.Println(req, err)
+
 
     res, err := stream.Recv()
     if err != nil {
         return err
     }
-    log.Println(res)
+    log.Println(res, err)
 
     time.Sleep(1)
     err = stream.Send(&pb.Command{
         DriverId: int32(dreverId),
         Cmd: cmdId,
     })
-    log.Println(req)
+    log.Println(req, err)
 
+    res, err = stream.Recv()
+    if err != nil {
+        return err
+    }
+    log.Println(res, err)
+
+    return nil
 }
 
