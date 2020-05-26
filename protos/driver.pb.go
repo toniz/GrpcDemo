@@ -305,15 +305,15 @@ var file_driver_proto_rawDesc = []byte{
 	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x73, 0x65, 0x71, 0x12, 0x12, 0x0a, 0x04, 0x64,
 	0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12,
 	0x12, 0x0a, 0x04, 0x70, 0x69, 0x6e, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70,
-	0x69, 0x6e, 0x67, 0x32, 0x77, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x12, 0x2f,
+	0x69, 0x6e, 0x67, 0x32, 0x7b, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x12, 0x33,
 	0x0a, 0x04, 0x43, 0x61, 0x6c, 0x6c, 0x12, 0x12, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c,
 	0x65, 0x72, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x1a, 0x11, 0x2e, 0x63, 0x6f, 0x6e,
-	0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x00, 0x12,
-	0x3b, 0x0a, 0x0a, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x61, 0x6c, 0x6c, 0x12, 0x12, 0x2e,
-	0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x13, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x00, 0x28,
+	0x01, 0x30, 0x01, 0x12, 0x3b, 0x0a, 0x0a, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x61, 0x6c,
+	0x6c, 0x12, 0x12, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65, 0x72, 0x2e, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x65,
+	0x72, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -434,7 +434,7 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ControlClient interface {
-	Call(ctx context.Context, in *Command, opts ...grpc.CallOption) (*Result, error)
+	Call(ctx context.Context, opts ...grpc.CallOption) (Control_CallClient, error)
 	StreamCall(ctx context.Context, opts ...grpc.CallOption) (Control_StreamCallClient, error)
 }
 
@@ -446,17 +446,39 @@ func NewControlClient(cc grpc.ClientConnInterface) ControlClient {
 	return &controlClient{cc}
 }
 
-func (c *controlClient) Call(ctx context.Context, in *Command, opts ...grpc.CallOption) (*Result, error) {
-	out := new(Result)
-	err := c.cc.Invoke(ctx, "/controler.Control/Call", in, out, opts...)
+func (c *controlClient) Call(ctx context.Context, opts ...grpc.CallOption) (Control_CallClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Control_serviceDesc.Streams[0], "/controler.Control/Call", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &controlCallClient{stream}
+	return x, nil
+}
+
+type Control_CallClient interface {
+	Send(*Command) error
+	Recv() (*Result, error)
+	grpc.ClientStream
+}
+
+type controlCallClient struct {
+	grpc.ClientStream
+}
+
+func (x *controlCallClient) Send(m *Command) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *controlCallClient) Recv() (*Result, error) {
+	m := new(Result)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *controlClient) StreamCall(ctx context.Context, opts ...grpc.CallOption) (Control_StreamCallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Control_serviceDesc.Streams[0], "/controler.Control/StreamCall", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Control_serviceDesc.Streams[1], "/controler.Control/StreamCall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -488,7 +510,7 @@ func (x *controlStreamCallClient) Recv() (*Response, error) {
 
 // ControlServer is the server API for Control service.
 type ControlServer interface {
-	Call(context.Context, *Command) (*Result, error)
+	Call(Control_CallServer) error
 	StreamCall(Control_StreamCallServer) error
 }
 
@@ -496,8 +518,8 @@ type ControlServer interface {
 type UnimplementedControlServer struct {
 }
 
-func (*UnimplementedControlServer) Call(context.Context, *Command) (*Result, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Call not implemented")
+func (*UnimplementedControlServer) Call(Control_CallServer) error {
+	return status.Errorf(codes.Unimplemented, "method Call not implemented")
 }
 func (*UnimplementedControlServer) StreamCall(Control_StreamCallServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamCall not implemented")
@@ -507,22 +529,30 @@ func RegisterControlServer(s *grpc.Server, srv ControlServer) {
 	s.RegisterService(&_Control_serviceDesc, srv)
 }
 
-func _Control_Call_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Command)
-	if err := dec(in); err != nil {
+func _Control_Call_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ControlServer).Call(&controlCallServer{stream})
+}
+
+type Control_CallServer interface {
+	Send(*Result) error
+	Recv() (*Command, error)
+	grpc.ServerStream
+}
+
+type controlCallServer struct {
+	grpc.ServerStream
+}
+
+func (x *controlCallServer) Send(m *Result) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *controlCallServer) Recv() (*Command, error) {
+	m := new(Command)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(ControlServer).Call(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/controler.Control/Call",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ControlServer).Call(ctx, req.(*Command))
-	}
-	return interceptor(ctx, in, info, handler)
+	return m, nil
 }
 
 func _Control_StreamCall_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -554,13 +584,14 @@ func (x *controlStreamCallServer) Recv() (*Request, error) {
 var _Control_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "controler.Control",
 	HandlerType: (*ControlServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Call",
-			Handler:    _Control_Call_Handler,
-		},
-	},
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Call",
+			Handler:       _Control_Call_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
 		{
 			StreamName:    "StreamCall",
 			Handler:       _Control_StreamCall_Handler,

@@ -40,12 +40,30 @@ func call() {
         Cmd: cmdId,
     }
 
-    log.Println(req)
-    res, err := guideClient.Call(context.Background(), &req)
+    stream, err := guideClient.Call(context.Background())
     if err != nil {
-        log.Printf("Call Server err: %v", err)
+        log.Printf("get stream call err: %v", err)
     }
+    defer stream.CloseSend()
 
-    log.Println(res.Data)
+    err = stream.Send(&pb.Command{
+        DriverId: int32(dreverId),
+        Cmd: cmdId,
+    })
+    log.Println(req)
+
+    res, err := stream.Recv()
+    if err != nil {
+        return err
+    }
+    log.Println(res)
+
+    time.Sleep(1)
+    err = stream.Send(&pb.Command{
+        DriverId: int32(dreverId),
+        Cmd: cmdId,
+    })
+    log.Println(req)
+
 }
 

@@ -27,7 +27,7 @@ message Response{
 }
 
 service Control{
-    rpc Call (Command) returns (Result){};
+    rpc Call (stream Command) returns (stream Result){};
     rpc StreamCall(stream Request) returns(stream Response){};
 }
 
