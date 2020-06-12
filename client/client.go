@@ -44,7 +44,16 @@ func call() error {
     if err != nil {
         log.Printf("get stream call err: %v", err)
     }
-    defer stream.CloseSend()
+    defer func(){
+        err := stream.CloseSend()
+        log.Println("3: ", err)
+    }()
+
+    err = stream.Send(&pb.Command{
+        DriverId: int32(dreverId),
+        Cmd: cmdId,
+    })
+    log.Println("1: ", err)
 
     err = stream.Send(&pb.Command{
         DriverId: int32(dreverId),
@@ -52,18 +61,19 @@ func call() error {
     })
     log.Println(req, err)
 
+
+
     err = stream.Send(&pb.Command{
         DriverId: int32(dreverId),
         Cmd: cmdId,
     })
-    log.Println(req, err)
-
+    log.Println( err)
 
     res, err := stream.Recv()
+    log.Println("2: ", err)
     if err != nil {
         return err
     }
-    log.Println(res, err)
 
     time.Sleep(1)
     err = stream.Send(&pb.Command{
@@ -77,6 +87,8 @@ func call() error {
         return err
     }
     log.Println(res, err)
+
+
 
     return nil
 }

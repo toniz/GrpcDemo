@@ -2,9 +2,10 @@ package main
 
 import (
     //"context"
-    "log"
+    "fmt"
     "net"
     "time"
+//    "errors"
 
     "google.golang.org/grpc"
     "google.golang.org/grpc/codes"
@@ -31,7 +32,7 @@ const (
 
 var (
     chans [5]SafeChannel
-    loginStatus [5]bool
+    fmtinStatus [5]bool
     cmdlist ActionList
 )
 
@@ -45,9 +46,9 @@ func init() {
 func main() {
     listener, err := net.Listen(Network, Address)
     if err != nil {
-        log.Fatalf("net.Listen err: %v", err)
+        fmt.Printf("net.Listen err: %v", err)
     }
-    log.Println(Address + " net.Listing...")
+    fmt.Println(Address + " net.Listing...")
     grpcServer := grpc.NewServer()
     pb.RegisterControlServer(grpcServer, &StreamService{})
 
@@ -61,7 +62,7 @@ func main() {
 
     err = grpcServer.Serve(listener)
     if err != nil {
-        log.Fatalf("grpcServer.Serve err: %v", err)
+        fmt.Printf("grpcServer.Serve err: %v", err)
     }
 }
 
@@ -70,26 +71,27 @@ func (s *StreamService) Call(srv pb.Control_CallServer)  error {
     var driverId int32
     var cmd string
     if name, err := srv.Recv(); err != nil {
-        log.Printf("Recv From Driver err: %v", err)
+        fmt.Printf("Recv From Driver err: %v", err)
         return err
     } else {
-        log.Printf("Driver driverId[%v] Client login", name.DriverId)
+        fmt.Printf("Driver driverId[%v] Client login", name.DriverId)
         driverId = name.DriverId
         cmd = name.Cmd
     }
     
-    if loginStatus[driverId] == false {
-        log.Printf("Driver[%d] Not Ready!", driverId)
-        err := srv.Send(&pb.Result{
-            DriverId: driverId,
-            Data: "driver not ready: " + cmd,
-        })
-        return err
+    if fmtinStatus[driverId] == false {
+        fmt.Printf("Driver[%d] Not Ready!", driverId)
+        //err := srv.Send(&pb.Result{
+        //    DriverId: driverId,
+        //    Data: "driver not ready: " + cmd,
+        //})
+        return status.Errorf(codes.AlreadyExists, "Driver Not Ready!")
+        //return errors.New("Driver Not Ready!")
     }
     
     select {
     case <-chans[driverId].mux:
-        log.Println("Receive Get Lock")
+        fmt.Println("Receive Get Lock")
     default:
         err := srv.Send(&pb.Result{
             DriverId: driverId,
@@ -99,17 +101,17 @@ func (s *StreamService) Call(srv pb.Control_CallServer)  error {
     }
     defer func(){ 
         chans[driverId].mux <- struct{}{}
-        log.Println("Receive Release Lock")    
+        fmt.Println("Receive Release Lock")    
     }()
         
     for {
         var driverId int32
         var cmd string
         if name, err := srv.Recv(); err != nil {
-            log.Printf("Recv From Driver err: %v", err)
+            fmt.Printf("Recv From Driver err: %v", err)
             return err
         } else {
-            log.Printf("Driver driverId[%v] cmd", name.DriverId)
+            fmt.Printf("Driver driverId[%v] cmd", name.DriverId)
             driverId = name.DriverId
             cmd = name.Cmd
         }
@@ -117,9 +119,9 @@ func (s *StreamService) Call(srv pb.Control_CallServer)  error {
         for _, v := range cmdlist[cmd] {
             select {
             case chans[driverId].ch <- v:
-         //       log.Printf("Send %s", v)
+         //       fmt.Printf("Send %s", v)
             case <-time.After(5 * time.Second):
-                log.Println("Send Timeout!")
+                fmt.Println("Send Timeout!")
                 err := srv.Send(&pb.Result{
                     DriverId: driverId,
                     Data: "Call Driver Timeout: " + cmd,
@@ -140,29 +142,29 @@ func (s *StreamService) StreamCall(srv pb.Control_StreamCallServer) error {
     var driverId int32
     var seq int32
     if name, err := srv.Recv(); err != nil {
-        log.Printf("Recv From Driver err: %v", err)
+        fmt.Printf("Recv From Driver err: %v", err)
         return err
     } else {
-        log.Printf("Driver driverId[%v] login", name.DriverId)
+        fmt.Printf("Driver driverId[%v] login", name.DriverId)
         driverId = name.DriverId
         seq = name.Seq
     }
 
-    if loginStatus[driverId] == true {
-        log.Printf("Driver driverId[%v] AlReady login", driverId)
-        return status.Errorf(codes.AlreadyExists, "AlReady login!")
+    if fmtinStatus[driverId] == true {
+        fmt.Printf("Driver driverId[%v] AlReady login", driverId)
+        return status.Errorf(codes.AlreadyExists, "AlReady fmtin!")
     }
 
-    loginStatus[driverId] = true
-    defer func(){loginStatus[driverId] = false}()
+    fmtinStatus[driverId] = true
+    defer func(){fmtinStatus[driverId] = false}()
 
     for {
         var val string
         select {
             case val = <- chans[driverId].ch:
-                log.Printf("Driver driverId[%v] Get Action [%s]!", driverId, val)
+                fmt.Printf("Driver driverId[%v] Get Action [%s]!", driverId, val)
             case <-time.After(3 * time.Second):
-                log.Printf("Driver driverId[%v] Timeout And Continue!", driverId)
+                fmt.Printf("Driver driverId[%v] Timeout And Continue!", driverId)
                 err := srv.Send(&pb.Response{
                     DriverId: driverId,
                     Seq: seq,
@@ -170,7 +172,7 @@ func (s *StreamService) StreamCall(srv pb.Control_StreamCallServer) error {
                 })
                 
                 if err != nil {
-                    log.Printf("Clinet err: %v", err)
+                    fmt.Printf("Clinet err: %v", err)
                     return err
                 }
 
@@ -184,22 +186,22 @@ func (s *StreamService) StreamCall(srv pb.Control_StreamCallServer) error {
         })
 
         if err != nil {
-            log.Printf("Clinet err: %v", err)
+            fmt.Printf("Clinet err: %v", err)
             return err
         }
 
         res, err := srv.Recv()
         if err != nil {
-            log.Printf("Recv From Clinet err: %v", err)
+            fmt.Printf("Recv From Clinet err: %v", err)
             return err
         }
 
         if seq != res.Seq {
-            log.Printf("Seq %d != %d ", seq, res.Seq)
+            fmt.Printf("Seq %d != %d ", seq, res.Seq)
         }
 
         seq++
-        log.Printf("Recv From Driver: %v", res)
+        fmt.Printf("Recv From Driver: %v", res)
     }
 }
 
